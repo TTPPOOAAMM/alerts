@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}Ваша корзина{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Корзина</h1>
+    {% if basket %}
+        <div class="basket-table-container">
+            <table class="basket-table">
+                <thead>
+                    <tr>
+                        <th>Изображение</th>
+                        <th>Товар</th>
+                        <th>Количество</th>
+                        <th>Цена за шт.</th>
+                        <th>Итого</th>
+                        <th style="text-align: center;">Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in basket %}
+                        {% with product=item.product %}
+                        <tr>
+                            <td class="basket-img-td">
+                                {% if product.photo %}
+                                    <img src="{{ product.photo.url }}" alt="{{ product.name }}" class="basket-item-img">
+                                {% else %}
+                                    <span class="basket-price-muted" style="font-size: 0.85rem;">Нет фото</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                <a href="{% url 'sneakers_detail' product.pk %}" class="basket-item-title">
+                                    {{ product.brand.name }} {{ product.name }}
+                                </a>
+                                <div class="basket-item-subtitle">Размер: {{ product.size }}</div>
+                            </td>
+                            
+                            <td>
+                                <div class="quantity-control-box">
+                                    <a href="{% url 'basket:basket_quantity_toggle' product.pk 'reduce' %}" class="quantity-btn">-</a>
+                                    <span class="quantity-value">{{ item.count }}</span>
+                                    <a href="{% url 'basket:basket_quantity_toggle' product.pk 'add' %}" class="quantity-btn">+</a>
+                                </div>
+                            </td>
+                            
+                            <td class="basket-price-muted">
+                                {{ item.price }} руб.
+                            </td>
+                            
+                            <td class="basket-price-total">
+                                {{ item.total_price }} руб.
+                            </td>
+                            
+                            <td style="text-align: center;">
+                                <a href="{% url 'basket:basket_remove' product.pk %}" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;">
+                                    Удалить
+                                </a>
+                            </td>
+                        </tr>
+                        {% endwith %}
+                    {% endfor %}
+                    <tr class="basket-summary-row">
+                        <td colspan="2">ВЫБРАНО ТОВАРОВ:</td>
+                        <td>{{ basket|length }} шт.</td>
+                        <td style="text-align: right;" class="basket-price-muted">Итоговая стоимость:</td>
+                        <td colspan="2" class="basket-final-price">{{ basket.get_total_price }} руб.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-actions" style="justify-content: space-between; align-items: center;">
+            <a href="{% url 'basket:basket_clear' %}" class="btn btn-danger">
+                Очистить корзину
+            </a>
+            
+            <div class="basket-actions-group">
+                <a href="{% url 'sneakers_list' %}" class="btn btn-secondary">
+                    Назад к каталогу
+                </a>
+                <a href="{% url 'basket:open_order' %}" class="btn">
+                    Оформить заказ →
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-orders-box">
+            <div class="empty-orders-icon">🛒</div>
+            <h3>Ваша корзина пуста</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Вы еще не добавили ни одной пары кроссовок в список покупок.</p>
+            <a href="{% url 'sneakers_list' %}" class="btn">Перейти к каталогу</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

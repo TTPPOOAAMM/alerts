@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_name %}История ваших заказов{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Мои заказы</h1>
+
+    {% if orders_list %}
+        <div class="orders-wrapper">
+            {% for order in orders_list %}
+                <div class="order-card">
+                    
+                    <div class="order-header">
+                        <div>
+                            <span class="order-title">Заказ №{{ order.id }}</span>
+                            <span class="order-date">от {{ order.date_create|date:"d.m.Y в H:i" }}</span>
+                        </div>
+                        <div class="order-total">
+                            {{ order.total_price }} руб.
+                        </div>
+                    </div>
+
+                    <div class="order-details">
+                        <p><b>Получатель:</b> {{ order.buyer_firstname }} {{ order.buyer_name }} {% if order.buyer_surname %}{{ order.buyer_surname }}{% endif %}</p>
+                        <p><b>Способ доставки:</b> {{ order.get_delivery_type_display }}</p>
+                        {% if order.delivery_address %}
+                            <p><b>Адрес доставки:</b> {{ order.delivery_address }}</p>
+                        {% endif %}
+                        {% if order.comment %}
+                            <p><b>Комментарий:</b> <span style="font-style: italic;">«{{ order.comment }}»</span></p>
+                        {% endif %}
+                    </div>
+
+                    <div class="order-items">
+                        <h4 class="order-items-title">Состав заказа:</h4>
+                        <ul class="order-items-list">
+                            {% for pos in order.pos_order_set.all %}
+                                <li class="order-item-row">
+                                    <span>
+                                        <a href="{% url 'sneakers_detail' pos.sneakers.pk %}" class="order-item-link">
+                                            {{ pos.sneakers.brand.name }} {{ pos.sneakers.name }}
+                                        </a> 
+                                        <span class="order-item-size">(Размер: {{ pos.sneakers.size }})</span>
+                                    </span>
+                                    <span class="order-item-meta">
+                                        {{ pos.count }} шт. × {{ pos.sneakers.price }} руб.
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-orders-box">
+            <div class="empty-orders-icon">📦</div>
+            <h3 style="color: var(--text-main); margin-bottom: 10px;">У вас пока нет заказов</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Вы ещё не совершили ни одной покупки в нашем магазине.</p>
+            <a href="{% url 'sneakers_list' %}" class="btn">Перейти к покупкам</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

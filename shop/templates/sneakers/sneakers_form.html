@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title_name %}
+    {% if form.instance.pk %}Редактирование{% else %}Добавление товара{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>{% if form.instance.pk %}Редактирование параметров{% else %}Добавление новой пары{% endif %}</h1>
+
+<div class="card card-form">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="field-errors">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn">Сохранить</button>
+            <a href="{% url 'sneakers_list' %}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}Авторизация пользователя{% endblock %}
+{% block content %}
+<div class="auth-card">
+    <h2 class="auth-title">Вход в систему</h2>
+    <form method="post" action="{% url 'basket:login_page' %}" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="non-field-errors">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                    <div class="field-errors">
+                        {% for error in field.errors %}
+                            • {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn" style="width: 100%;">
+            Войти
+        </button>
+    </form>
+    <div class="auth-footer">
+        Ещё нет аккаунта? 
+        <a href="{% url 'basket:registration_page' %}">Зарегистрироваться</a>
+    </div>
+</div>
+{% endblock %}

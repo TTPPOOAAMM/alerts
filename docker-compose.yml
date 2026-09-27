@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: sneaker_postgres_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    expose:
+      - "5432"
+    restart: always
+
+  web:
+    build: .
+    container_name: sneaker_django_web
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate &&
+             gunicorn sneaker_shop.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    expose:
+      - "8000"
+    environment:
+      - DB_NAME=sneaker_db
+      - DB_USER=postgres
+      - DB_PASSWORD=123
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SECRET_KEY=django-insecure-3c_7g9t%1qg#0r=jdl@$$rk(c1gd-308@k$$l&uwz#3_f63hpr==
+    depends_on:
+      - db
+    restart: always
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: sneaker_nginx_proxy
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/static
+      - media_volume:/app/media
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    restart: always
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

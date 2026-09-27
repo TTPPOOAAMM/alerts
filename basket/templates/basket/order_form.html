@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}Оформление заказа{% endblock %}
+{% block content %}
+<div class="auth-card" style="max-width: 600px;"> <h2 class="auth-title">Оформление заказа</h2>
+    <form method="post" action="{% url 'basket:basket_buy' %}" novalidate>
+        {% csrf_token %}
+        {% if form_order.non_field_errors %}
+            <div class="non-field-errors">
+                {% for error in form_order.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% for field in form_order %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>          
+                {{ field }}                
+                {% if field.help_text %}
+                    <span class="form-help">
+                        {{ field.help_text|safe }}
+                    </span>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="field-errors">
+                        {% for error in field.errors %}
+                            • {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div class="form-actions" style="margin-top: 25px;">
+            <button type="submit" class="btn" style="width: 100%;">
+                Подтвердить заказ
+            </button>
+        </div>
+    </form>
+    <div class="auth-footer">
+        Ошиблись в выборе? 
+        <a href="{% url 'basket:basket_detail' %}">Вернуться в корзину</a>
+    </div>
+</div>
+{% endblock %}

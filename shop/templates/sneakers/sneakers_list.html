@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_name %}Каталог кроссовок{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Каталог кроссовок</h1>
+
+    {% if sneakers_list %}
+        <div class="sneaker-grid">
+            {% for sneaker in sneakers_list %}
+                <div class="card">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        {% if sneaker.photo %}
+                            <img src="{{ sneaker.photo.url }}" alt="{{ sneaker.name }}" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: var(--radius);">
+                        {% else %}
+                            <div style="height: 200px; background: var(--bg-main); display: flex; align-items: center; justify-content: center; border-radius: var(--radius); color: var(--text-muted);">Нет фото</div>
+                        {% endif %}
+                    </div>
+
+                    <h3>{{ sneaker.brand.name }} {{ sneaker.name }}</h3>
+                    <p><b>Цена:</b> {{ sneaker.price }} руб.</p>
+                    <p><b>Размер:</b> {{ sneaker.size }}</p>
+                    <p><b>Цвет:</b> {{ sneaker.color }}</p>
+                    
+                    <div class="card-actions" style="margin-top: auto; display: flex; gap: 10px;">
+                        <a href="{% url 'sneakers_detail' sneaker.pk %}" class="btn btn-secondary">Подробнее</a>
+                        
+                        {% if perms.shop.change_sneakers %}
+                            <a href="{% url 'sneakers_update' sneaker.pk %}" class="btn" style="background-color: #ffc107; color: #212529;">Изменить</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="alert alert-info">В каталоге пока нет товаров.</p>
+    {% endif %}
+</div>
+{% endblock %}

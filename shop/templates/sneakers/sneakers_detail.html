@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title_name %}{{ sneaker.brand.name }} {{ sneaker.name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ sneaker.brand.name }} — {{ sneaker.name }}</h1>
+    
+    <div class="detail-box">
+        <div>
+            {% if sneaker.photo %}
+                <img src="{{ sneaker.photo.url }}" class="detail-img" alt="{{ sneaker.name }}">
+            {% else %}
+                <p>Нет изображения</p>
+            {% endif %}
+        </div>
+        
+        <div class="detail-info">
+            <p><b>Описание:</b> {{ sneaker.description|default:"Описание отсутствует" }}</p>
+            <p><b>Цена:</b> {{ sneaker.price }} руб.</p>
+            <p><b>Размер:</b> {{ sneaker.size }}</p>
+            <p><b>Цвет:</b> {{ sneaker.color }}</p>
+            <p><b>Доступность:</b> 
+                {% if sneaker.is_exists %} 
+                    <span class="badge">В наличии</span> 
+                {% else %} 
+                    <span style="color: var(--danger); font-weight: bold;">Нет на складе</span> 
+                {% endif %}
+            </p>
+            <p><b>Категории:</b> 
+                {% for cat in sneaker.category.all %}
+                    {{ cat.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            
+            <div style="margin-top: 25px; padding: 20px; background: var(--bg-main); border-radius: var(--radius);">
+                {% if request.user.is_authenticated %}
+                    {% if sneaker.is_exists %}
+                        <form method="post" action="{% url 'basket:basket_add' sneaker.pk %}">
+                            {% csrf_token %}
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label for="id_count">Количество:</label>
+                                <input type="number" name="count" value="1" min="1" id="id_count" class="form-control" style="max-width: 100px;">
+                            </div>
+                            <input type="hidden" name="reload" value="False">
+                            <button type="submit" class="btn">🛒 Добавить в корзину</button>
+                        </form>
+                    {% else %}
+                        <p style="color: var(--danger); font-weight: bold;">Модель временно недоступна для заказа</p>
+                    {% endif %}
+                {% else %}
+                    <p>Чтобы покупать товары, <a href="{% url 'basket:login_page' %}" style="color: var(--accent); font-weight: bold;">авторизуйтесь</a>.</p>
+                {% endif %}
+            </div>
+            
+            <div class="card-actions" style="margin-top: 30px;">
+                <a href="{% url 'sneakers_list' %}" class="btn btn-secondary">Назад к списку</a>
+                
+                {% if perms.shop.change_sneakers %}
+                    <a href="{% url 'sneakers_update' sneaker.pk %}" class="btn">Редактировать</a>
+                {% endif %}
+                
+                {% if perms.shop.delete_sneakers %}
+                    <a href="{% url 'sneakers_delete' sneaker.pk %}" class="btn btn-danger">Удалить из базы</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
