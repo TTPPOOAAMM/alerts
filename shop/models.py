@@ -88,3 +88,13 @@ class Pos_order(models.Model):
     class Meta:
         verbose_name = 'Позиция заказа'
         verbose_name_plural = 'Позиции заказов'
+
+class PersistentMetric(models.Model):
+    name = models.CharField(max_length=128, verbose_name="Имя метрики")
+    labels = models.CharField(max_length=255, default="", blank=True, verbose_name="Метки")
+    value = models.FloatField(default=0.0, verbose_name="Значение")
+
+    class Meta:
+        unique_together = ('name', 'labels')
+        verbose_name = "Метрика Prometheus"
+        verbose_name_plural = "Метрики Prometheus"

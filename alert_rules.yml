@@ -1,0 +1,24 @@
+groups:
+  - name: app_monitoring
+    rules:
+      - alert: HighDjangoRPS
+        expr: sum(rate(django_http_requests_total_by_method_total[1m])) > 1
+        for: 5s
+        labels:
+          severity: warning
+          category: application
+        annotations:
+          summary: "Высокая нагрузка на магазин кроссовок"
+          description: "Текущий RPS: {{ $value | printf \"%.2f\" }} запр/сек"
+
+  - name: pc_monitoring
+    rules:
+      - alert: HighHostCPULoad
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 35
+        for: 5s
+        labels:
+          severity: critical
+          category: host_pc
+        annotations:
+          summary: "Высокая нагрузка на CPU"
+          description: "Загрузка процессора составила {{ $value | printf \"%.1f\" }}%"

@@ -8,6 +8,7 @@ urlpatterns = [
     path('basket/', include('basket.urls', namespace='basket')),  
     path('api/v1/', include('api_shop.urls')),  
     path('', include('shop.urls')),
+    path('', include('django_prometheus.urls')),
 ]
 
 if settings.DEBUG:
